@@ -1,13 +1,10 @@
-# Overview
+# 概述
 
-GraphQL is a query language designed to build client applications by providing
-an intuitive and flexible syntax and system for describing their data
-requirements and interactions.
+GraphQL是一种查询语言，旨在通过提供直观灵活的语法和对应的支持系统来描述其数据需求与交互，以便构建客户端应用程序。
 
-For example, this GraphQL request will receive the name of the user with id 4
-from the Facebook implementation of GraphQL.
+例如，此GraphQL请求将从Facebook的GraphQL实现中获取id为4的用户名。
 
-```graphql
+```
 {
   user(id: 4) {
     name
@@ -15,7 +12,7 @@ from the Facebook implementation of GraphQL.
 }
 ```
 
-Which produces the resulting data (in JSON):
+这个查询会返回以下结果（JSON）：
 
 ```js
 {
@@ -25,61 +22,20 @@ Which produces the resulting data (in JSON):
 }
 ```
 
-GraphQL is not a programming language capable of arbitrary computation, but is
-instead a language used to query application servers that have
-capabilities defined in this specification. GraphQL does not mandate a
-particular programming language or storage system for application servers that
-implement it. Instead, application servers take their capabilities and map them
-to a uniform language, type system, and philosophy that GraphQL encodes.
-This provides a unified interface friendly to product development and a powerful
-platform for tool-building.
+GraphQL并非一门图灵完善的语言，而是用于查询符合本规范中定义的功能的应用程序服务器的语言。GraphQL不会为实施它的应用程序服务器强制使用特定的编程语言或存储系统。相反，应用程序服务器承担其功能的实现，将其映射到统一的一个语言、类型系统和哲学，对应GraphQL（实际的）编码。这提供了一个对产品开发友好的统一强大的工具构建平台。
 
-GraphQL has a number of design principles:
+GraphQL 有几个设计原则
 
- * **Hierarchical**: Most product development today involves the creation and
-   manipulation of view hierarchies. To achieve congruence with the structure
-   of these applications, a GraphQL query itself is structured hierarchically.
-   The query is shaped just like the data it returns. It is a natural
-   way for clients to describe data requirements.
+- 层级化： 今天大部分应用程序的开发涉及到了创建和操作多层次的结构。为了和这些应用所需的结构的保持一致，GraphQL的查询本身是分层结构的，查询的结构与返回的结构保持一致。这样的表述方式对于客户端开发是很自然的方式
 
- * **Product-centric**: GraphQL is unapologetically driven by the requirements
-   of views and the front-end engineers that write them. GraphQL starts with
-   their way of thinking and requirements and builds the language and runtime
-   necessary to enable that.
+- 以产品为中心： GraphQL由编写视图层的前端工程师所驱动。 为了满足他们的思维和要求，设计了这门语言并构建了其运行时
 
- * **Strong-typing**: Every GraphQL server defines an application-specific
-   type system. Queries are executed within the context of that type system.
-   Given a query, tools can ensure that the query is both syntactically
-   correct and valid within the GraphQL type system before execution, i.e. at
-   development time, and the server can make certain guarantees about the shape
-   and nature of the response.
+- 强类型: 每个GraphQL服务器都定义了特定于用户该应用程序的类型系统，查询在该类型系统的上下文中执行。给定一个查询，工具可以确保查询语句在执行之前在GraphQL类型系统中是正确的和有效的，即在开发时，服务器响应的数据的结构与类型是确定的。
 
- * **Client-specified queries**: Through its type system, a GraphQL server
-   publishes the capabilities that its clients are allowed to consume. It is
-   the client that is responsible for specifying exactly how it will consume
-   those published capabilities. These queries are specified at field-level
-   granularity. In the majority of client-server applications written
-   without GraphQL, the server determines the data returned in its various
-   scripted endpoints. A GraphQL query, on the other hand, returns exactly what
-   a client asks for and no more.
+- 客户端定义的查询：通过其类型系统，GraphQL服务器发布其客户端可以使用的功能。客户端负责指定它将如何使用这些发布的功能。这些查询以字段级粒度指定。在没有GraphQL的大部分C/S类型的应用程序中，服务器定义返回的数据。另一方面，GraphQL可以良好的查询与返回客户端要求的内容， 无需额外的东西。
 
- * **Introspective**: GraphQL is introspective. A GraphQL server's type system
-   must be queryable by the GraphQL language itself, as will be described in this
-   specification. GraphQL introspection serves as a powerful platform for
-   building common tools and client software libraries.
+- 可内观／内省的： GraphQL是可内观／内省的。 一个GraphQL的类型系统必须可以被GraphQL本身所查询，如本规范中所述。GraphQL可内观／内省的特效为构建通用工具和客户端软件库提供了可能性。
 
-Because of these principles, GraphQL is a powerful and productive environment
-for building client applications. Product developers and designers building
-applications against working GraphQL servers -- supported with quality tools --
-can quickly become productive without reading extensive documentation and with
-little or no formal training. To enable that experience, there must be those
-that build those servers and tools.
+正是由于这些原则，GraphQL是一个构建客户端应用程序的强大而高效的环境。产品开发人员和设计人员的构建应用程序，无须使用GraphQL服务器（通过CI工具支持）就可以快速生效，而无需阅读广泛的文档，也不需要正式的培训。为了实现这一目的，这一套体系是必须的。
 
-The following formal specification serves as a reference for those builders.
-It describes the language and its grammar, the type system and the
-introspection system used to query it, and the execution and validation engines
-with the algorithms to power them. The goal of this specification is to provide
-a foundation and framework for an ecosystem of GraphQL tools, client libraries,
-and server implementations -- spanning both organizations and platforms -- that
-has yet to be built. We look forward to working with the community
-in order to do that.
+以下的正式规范作为开发者的参考。它描述了语言及其语法，类型系统和用于查询它的内省系统，以及使用算法为其提供支持的执行和验证引擎。本规范的目标是为尚未构建的GraphQL工具，客户端库和服务器实现（跨越组织和平台）提供一个基础和框架。我们期待与社区合作，以此来做到这一点。

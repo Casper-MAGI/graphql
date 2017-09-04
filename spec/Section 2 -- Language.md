@@ -1,100 +1,72 @@
-# Language
+# 语言
 
-Clients use the GraphQL query language to make requests to a GraphQL service.
-We refer to these request sources as documents. A document may contain
-operations (queries, mutations, and subscriptions) as well as fragments, a
-common unit of composition allowing for query reuse.
+客户端使用GraphQL查询语言向GraphQL服务发出请求。我们将这些请求源称为文档（documents）。文档可能包含操作（查询（queries），变更（mutations）和订阅（subscriptions））以及片段（fragments），这（fragments）是允许查询重用的组成部分。
 
-A GraphQL document is defined as a syntactic grammar where terminal symbols are
-tokens (indivisible lexical units). These tokens are defined in a lexical
-grammar which matches patterns of source characters (defined by a
-double-colon `::`).
+GraphQL文档被定义为句法语法，其中最小符号是token（不可分割的词汇单位）。 这些token在词法语法中定义，它由源字符（由双冒号`::`)定义。
 
 
-## Source Text
+## 源文本(Source Text)
 
 SourceCharacter :: /[\u0009\u000A\u000D\u0020-\uFFFF]/
 
-GraphQL documents are expressed as a sequence of
-[Unicode](http://unicode.org/standard/standard.html) characters. However, with
-few exceptions, most of GraphQL is expressed only in the original non-control
-ASCII range so as to be as widely compatible with as many existing tools,
-languages, and serialization formats as possible and avoid display issues in
-text editors and source control.
+GraphQL文档表示为一个Unicode字符序列。然而，除了少数例外，GraphQL的大部分仅以原始的非控制ASCII(可参考：http://unicode.org/standard/standard.html)范围表示，以便尽可能广泛地兼容现有的工具，语言和序列化格式，并避免文本编辑器和源代码控制系统中的显示问题。
 
 
 ### Unicode
 
-UnicodeBOM :: "Byte Order Mark (U+FEFF)"
+UnicodeBOM :: "字节顺序标记(Byte Order Mark) (U+FEFF)"
 
-Non-ASCII Unicode characters may freely appear within {StringValue} and
-{Comment} portions of GraphQL.
+非ASCII Unicode字符可以自由出现在{StringValue}和
+GraphQL的{Comment}部分。
 
-The "Byte Order Mark" is a special Unicode character which
-may appear at the beginning of a file containing Unicode which programs may use
-to determine the fact that the text stream is Unicode, what endianness the text
-stream is in, and which of several Unicode encodings to interpret.
+字节顺序标记(Byte Order Mark)是一个特殊的Unicode字符。可能出现在文件的开头，以用来帮助程序确定文本流为Unicode和特别的Unicode的编码版本。
 
 
-### White Space
+### 空白
 
-WhiteSpace ::
-  - "Horizontal Tab (U+0009)"
-  - "Space (U+0020)"
+空白 ::
+  - "水平制表符Tab (U+0009)"
+  - "空格 (U+0020)"
 
-White space is used to improve legibility of source text and act as separation
-between tokens, and any amount of white space may appear before or after any
-token. White space between tokens is not significant to the semantic meaning of
-a GraphQL query document, however white space characters may appear within a
-{String} or {Comment} token.
+空白用于提高源代码的可读性。任意数量的空白可能出现在token之前或者之后。
+token之间的空白对于语法意义上来说并不重要，但是空白字符可能出现在
+{String}或{Comment}token之中。
 
-Note: GraphQL intentionally does not consider Unicode "Zs" category characters
-as white-space, avoiding misinterpretation by text editors and source
-control tools.
+注意：GraphQL有意地不考虑Unicode“Zs”类别字符作为空白，避免来自于文本编辑和版本控制工具的误解。
 
 
-### Line Terminators
+### 换行
 
-LineTerminator ::
-  - "New Line (U+000A)"
-  - "Carriage Return (U+000D)" [ lookahead ! "New Line (U+000A)" ]
-  - "Carriage Return (U+000D)" "New Line (U+000A)"
+换行 ::
+  - "换行符 LF (U+000A)" (LF)
+  - "回车符CR  (U+000D)" [和换行符(U+000A)不一样] (CR)
+  - "回车符 CR (U+000D)"" 换行符 LF(U+000A)" (CRLF)
 
-Like white space, line terminators are used to improve the legibility of source
-text, any amount may appear before or after any other token and have no
-significance to the semantic meaning of a GraphQL query document. Line
-terminators are not found within any other token.
+和空格一样，换行用于提高源代码的可读性，任何数量的换行符可能
+出现在任何其他token之前或之后，并没有任何对于GraphQL文档的语法上的意义。
+任何其他的token中都不存在终止符。
 
-Note: Any error reporting which provide the line number in the source of the
-offending syntax should use the preceding amount of {LineTerminator} to produce
-the line number.
+注意：任何提供行号的错误报告中关于非法语法的提示应该使用前面的
+{LineTerminator}数量来生成
 
 
-### Comments
+### 注释 (Comments)
 
-Comment :: `#` CommentChar*
+注释 :: `#` 注释符*
 
-CommentChar :: SourceCharacter but not LineTerminator
+注释符 :: 除换行外所有的原始字符
 
-GraphQL source documents may contain single-line comments, starting with the
-{`#`} marker.
+GraphQL 的源码文档有时会包含{`#`}开头的单行注释。
 
-A comment can contain any Unicode code point except {LineTerminator} so a
-comment always consists of all code points starting with the {`#`} character up
-to but not including the line terminator.
+一个注释可以包含除了 {LineTerminator} 之外的任何字符。所以一个注释总是会包含从 {`#`} 开始直到换行之前的所有字符
 
-Comments behave like white space and may appear after any token, or before a
-line terminator, and have no significance to the semantic meaning of a GraphQL
-query document.
+注释与空白相同，可能出现在任何token之后或换行之前，同时不对语句文段产生任何语义上的影响.
 
+### 不重要的逗号(Insignificant Commas)
 
-### Insignificant Commas
+逗号(Comma) :: `,`
 
-Comma :: ,
-
-Similar to white space and line terminators, commas ({`,`}) are used to improve
-the legibility of source text and separate lexical tokens but are otherwise
-syntactically and semantically insignificant within GraphQL query documents.
+与空格和行终止符类似, 逗号(Comma)  ({`,`}) 用于提高源代码的可读性，并进行单独的词汇标记。除非是在GraphQL查询文档（query documents）之中，在语法和语意上都没有用处。
 
 Non-significant comma characters ensure that the absence or presence of a comma
 does not meaningfully alter the interpreted syntax of the document, as this can
