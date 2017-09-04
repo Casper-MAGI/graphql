@@ -22,9 +22,9 @@ GraphQL的{Comment}部分。
 字节顺序标记(Byte Order Mark)是一个特殊的Unicode字符。可能出现在文件的开头，以用来帮助程序确定文本流为Unicode和特别的Unicode的编码版本。
 
 
-### 空白
+### 空白(WhiteSpace)
 
-空白 ::
+空白(WhiteSpace) ::
   - "水平制表符Tab (U+0009)"
   - "空格 (U+0020)"
 
@@ -35,11 +35,11 @@ token之间的空白对于语法意义上来说并不重要，但是空白字符
 注意：GraphQL有意地不考虑Unicode“Zs”类别字符作为空白，避免来自于文本编辑和版本控制工具的误解。
 
 
-### 换行
+### 换行(LineTerminator)
 
-换行 ::
+换行(LineTerminator) ::
   - "换行符 LF (U+000A)" (LF)
-  - "回车符CR  (U+000D)" [和换行符(U+000A)不一样] (CR)
+  - "回车符CR  (U+000D)" (和换行符(U+000A)不一样) (CR)
   - "回车符 CR (U+000D)"" 换行符 LF(U+000A)" (CRLF)
 
 和空格一样，换行用于提高源代码的可读性，任何数量的换行符可能
@@ -52,7 +52,7 @@ token之间的空白对于语法意义上来说并不重要，但是空白字符
 
 ### 注释 (Comments)
 
-注释 :: `#` 注释符*
+注释 : `#` 
 
 注释符 :: 除换行外所有的原始字符
 
@@ -68,116 +68,91 @@ GraphQL 的源码文档有时会包含{`#`}开头的单行注释。
 
 与空格和行终止符类似, 逗号(Comma)  ({`,`}) 用于提高源代码的可读性，并进行单独的词汇标记。除非是在GraphQL查询文档（query documents）之中，在语法和语意上都没有用处。
 
-Non-significant comma characters ensure that the absence or presence of a comma
-does not meaningfully alter the interpreted syntax of the document, as this can
-be a common user-error in other languages. It also allows for the stylistic use
-of either trailing commas or line-terminators as list delimiters which are both
-often desired for legibility and maintainability of source code.
+不重要的逗号字符确保了无论逗号是否存在，都不会改变documents的语意，以避免了和其他语言因为逗号而报错。处于源代码的可读性和我可维护性的考虑，使用两个逗号作为行终止符也被允许。
 
 
-### Lexical Tokens
+### 词汇tokens (Lexical Tokens)
 
 Token ::
-  - Punctuator
-  - Name
-  - IntValue
-  - FloatValue
-  - StringValue
+  - 标点(Punctuator)
+  - 名称(Name)
+  - int数值(IntValue)
+  - 浮点数值(FloatValue)
+  - 字符串值(StringValue)
 
-A GraphQL document is comprised of several kinds of indivisible lexical tokens
-defined here in a lexical grammar by patterns of source Unicode characters.
-
-Tokens are later used as terminal symbols in a GraphQL query document syntactic
-grammars.
+GraphQL文档由几种不可分割的词汇token组成，通过源Unicode字符的特定模式在词法语法中定义。
 
 
-### Ignored Tokens
-
-Ignored ::
-  - UnicodeBOM
-  - WhiteSpace
-  - LineTerminator
-  - Comment
-  - Comma
-
-Before and after every lexical token may be any amount of ignored tokens
-including {WhiteSpace} and {Comment}. No ignored regions of a source
-document are significant, however ignored source characters may appear within
-a lexical token in a significant way, for example a {String} may contain white
-space characters.
-
-No characters are ignored while parsing a given token, as an example no
-white space characters are permitted between the characters defining a
-{FloatValue}.
+token在GraphQL查询文档句法中被用作终端符号语法。
 
 
-### Punctuators
+### 被跳过的token(Ignored Tokens)
 
-Punctuator :: one of ! $ ( ) ... : = @ [ ] { | }
+跳过 ::
+  - BOM符号(UnicodeBOM)
+  - 空白(WhiteSpace)
+  - 换行(LineTerminator)
+  - 注释(Comment)
+  - 逗号(Comma)
 
-GraphQL documents include punctuation in order to describe structure. GraphQL
-is a data description language and not a programming language, therefore GraphQL
-lacks the punctuation often used to describe mathematical expressions.
+每个词汇token之前和之后可能是任意数量的被忽略的token包括{WhiteSpace}和{Comment}。 没有忽略的token重要的，不过某些一般被忽略的字符可能会出现在一个有意义的词法标记中，例如{String}可能包含白色空格字符。
 
-
-### Names
-
-Name :: /[_A-Za-z][_0-9A-Za-z]*/
-
-GraphQL query documents are full of named things: operations, fields, arguments,
-directives, fragments, and variables. All names must follow the same
-grammatical form.
-
-Names in GraphQL are case-sensitive. That is to say `name`, `Name`, and `NAME`
-all refer to different names. Underscores are significant, which means
-`other_name` and `othername` are two different names.
-
-Names in GraphQL are limited to this <acronym>ASCII</acronym> subset of possible
-characters to support interoperation with as many other systems as possible.
+在解析给定的token时，不会忽略任何字符，没有例外。比如定义一个{floatValue}时候，字符之间允许使用空白字符。
 
 
-## Query Document
+### 标点(Punctuator)
 
-Document : Definition+
+标点(Punctuator) ::  
 
-Definition :
-  - OperationDefinition
-  - FragmentDefinition
+- `! $ ( ) ... : = @ [ ] { | }`
 
-A GraphQL query document describes a complete file or request string received by
-a GraphQL service. A document contains multiple definitions of Operations and
-Fragments. GraphQL query documents are only executable by a server if they
-contain an operation. However documents which do not contain operations may
-still be parsed and validated to allow client to represent a single request
-across many documents.
-
-If a document contains only one operation, that operation may be unnamed or
-represented in the shorthand form, which omits both the query keyword and
-operation name. Otherwise, if a GraphQL query document contains multiple
-operations, each operation must be named. When submitting a query document with
-multiple operations to a GraphQL service, the name of the desired operation to
-be executed must also be provided.
+GraphQL文档包括了标点符号以便描述结构。GraphQL是一种数据描述语言，而不是一种编程语言，因此GraphQL缺少经常用来描述数学表达式的标点符号。
 
 
-## Operations
+### 名称(Name)
 
-OperationDefinition :
-  - OperationType Name? VariableDefinitions? Directives? SelectionSet
-  - SelectionSet
+名称(Name) :: 
 
-OperationType : one of `query` `mutation` `subscription`
+- `/[_A-Za-z][_0-9A-Za-z]*/`
 
-There are three types of operations that GraphQL models:
+GraphQL文档中有数种名称(Name): 操作(operations), 域(fields), 别称(arguments),
+指令(directives), 片段(fragments), 变量(variables). 所有的名称(Name)必须遵循相同的语法形式.
 
-  * query - a read-only fetch.
-  * mutation - a write followed by a fetch.
-  * subscription - a long-lived request that fetches data in response to source
-    events.
+名称(Name)对大消息敏感，`name`, `NAME`是两个不同的名称(Name)。 下划线也是不可忽视的，`other_name`和`othername`是两个不同的名字。
 
-Each operation is represented by an optional operation name and a selection set.
+GraphQL中的名称限于此可能的<acronym>ASCII</acronym>子集，以便能良好和其他系统交互。
 
-For example, this mutation operation might "like" a story and then retrieve the
-new number of likes:
+
+## 查询文档(Query Document)
+
+文档(Document)定义
+
+定义 :
+  - 操作定义／OperationDefinition
+  - 片段定义／FragmentDefinition
+
+GraphQL查询文档描述了一个可以被GraphQL服务接受的完整的文件或请求字符串。 文档包含操作的多个定义片段（FragmentDefinition）。 当query document包含了任意操作的时候，可以被服务器解析，但是不包含操作的时候，也允许被解析和验证，以便允许客户端表示的单个请求中包含了多个文件。
+
+如果一个文档只包含一个操作，则该操作可能未命名或以缩写形式表示，省略了查询关键字和操作名称。 否则，如果GraphQL查询文档包含多个操作，每个操作都必须命名。 当提交查询文档时包含了对GraphQL服务的多个操作，所需操作的名称还必须提供才能执行。
+
+
+## 操作(operations)
+
+操作定义／OperationDefinition :
+  - 操作类型名称？ 变量定义， 指令， 选择集 ／OperationType Name? VariableDefinitions? Directives? SelectionSet
+  - 选择集 ／ SelectionSet
+
+操作类型 ／OperationType :  `query（查询）` `mutation（变更）` `subscription（订阅）`  中的一个
+
+GraphQL模型有三种操作类型:
+
+  * query（查询） - 一个只读请求.
+  * mutation（变更） - 一个写入请求
+  * subscription（订阅） - 一个长链接，以订阅响应源的特定数据
+
+每个操作由可选的操作名称和选择集表示。
+
+例如，这个变更操作可能会“喜欢”一个故事，然后检索新的喜欢数量：
 
 ```
 mutation {
@@ -189,13 +164,11 @@ mutation {
 }
 ```
 
-**Query shorthand**
+**查询简写**
 
-If a document contains only one query operation, and that query defines no
-variables and contains no directives, that operation may be represented in a
-short-hand form which omits the query keyword and query name.
+如果文档仅包含一个查询操作，并且该查询定义了否变量并且不包含指令，该操作可以表述为简写形式，省略查询关键字和查询名称。
 
-For example, this unnamed query operation is written via query shorthand.
+例如，这个未命名的查询操作是通过查询简写来编写的。
 
 ```graphql
 {
@@ -203,8 +176,7 @@ For example, this unnamed query operation is written via query shorthand.
 }
 ```
 
-Note: many examples below will use the query short-hand syntax.
-
+注意：下面很多例子将使用查询简写语法。
 
 ## Selection Sets
 
