@@ -115,7 +115,7 @@ GraphQL文档包括了标点符号以便描述结构。GraphQL是一种数据描
 
 - `/[_A-Za-z][_0-9A-Za-z]*/`
 
-GraphQL文档中有数种名称(Name): 操作(operations), 域(fields), 别称(arguments),
+GraphQL文档中有数种名称(Name): 操作(operations), 域(fields), 参数(arguments),
 指令(directives), 片段(fragments), 变量(variables). 所有的名称(Name)必须遵循相同的语法形式.
 
 名称(Name)对大消息敏感，`name`, `NAME`是两个不同的名称(Name)。 下划线也是不可忽视的，`other_name`和`othername`是两个不同的名字。
@@ -178,18 +178,16 @@ mutation {
 
 注意：下面很多例子将使用查询简写语法。
 
-## Selection Sets
+## 选择集(Selection Sets)
 
 SelectionSet : { Selection+ }
 
-Selection :
-  - Field
-  - FragmentSpread
-  - InlineFragment
+（Selection） :
+  - 域／ield
+  - 片段解构／FragmentSpread
+  - 行内片段／InlineFragment
 
-An operation selects the set of information it needs, and will receive exactly
-that information and nothing more, avoiding over-fetching and
-under-fetching data.
+一个操作选择了其需要的信息，并且会确定的收到查询的信息不会有额外的信息。有效避免了传统单次请求中数据过多或过少的情况。
 
 ```graphql
 {
@@ -199,25 +197,18 @@ under-fetching data.
 }
 ```
 
-In this query, the `id`, `firstName`, and `lastName` fields form a selection
-set. Selection sets may also contain fragment references.
+在这个query中, `id`, `firstName`, 和 `lastName` 这些field处于同一个选择集(Selection Sets). 选择集(Selection Sets)也可以包含片段的定义.
 
 
-## Fields
+## 域(Fields)
 
-Field : Alias? Name Arguments? Directives? SelectionSet?
+域(Fields) : Alias, Name Arguments, Directives, SelectionSet,
 
-A selection set is primarily composed of fields. A field describes one discrete
-piece of information available to request within a selection set.
+选择集主要由字段组成。 一个域描述一个离散的可在选择集中请求的信息。
 
-Some fields describe complex data or relationships to other data. In order to
-further explore this data, a field may itself contain a selection set, allowing
-for deeply nested requests. All GraphQL operations must specify their selections
-down to fields which return scalar values to ensure an unambiguously
-shaped response.
+一些字段描述与其他数据的复杂数据或关系。为了进一步请求这个数据，一个字段本身可以包含一个选择集，允许深入嵌套的请求。所有GraphQL操作必须指定其选择集直到返回标量值的字段，以确保明确得到预定的响应。
 
-For example, this operation selects fields of complex data and relationships
-down to scalar values.
+例如，下面的操作表示了对于复杂数据的请求，其中的包含了更低层次的域，并描述了对应的字段结构。
 
 ```graphql
 {
@@ -260,18 +251,15 @@ unique identifier.
 ```
 
 
-## Arguments
+## 参数(Arguments)
 
 Arguments : ( Argument+ )
 
 Argument : Name : Value
 
-Fields are conceptually functions which return values, and occasionally accept
-arguments which alter their behavior. These arguments often map directly to
-function arguments within a GraphQL server's implementation.
+域(Fields)是一个概念上的函数，有时候也会接受特定的参数. 这些参数通常直接映射到GraphQL服务器中对应的函数实现之中。
 
-In this example, we want to query a specific user (requested via the `id`
-argument) and their profile picture of a specific `size`:
+在下面的例子中，我们要查询一个特定的用户(通过`id`这个参数来请求)并且将图片限制在一个特定大小上，通过`size`这个参数:
 
 ```graphql
 {
@@ -283,7 +271,7 @@ argument) and their profile picture of a specific `size`:
 }
 ```
 
-Many arguments can exist for a given field:
+多参数可以在同一个域中共存:
 
 ```graphql
 {
@@ -295,12 +283,11 @@ Many arguments can exist for a given field:
 }
 ```
 
-**Arguments are unordered**
+**参数(Arguments) 是无顺序的！**
 
-Arguments may be provided in any syntactic order and maintain identical
-semantic meaning.
+参数可以用任意的句法顺序表示，并拥有同等的语意。
 
-These two queries are semantically identical:
+以下两个query是等效的。
 
 ```graphql
 {
@@ -315,15 +302,13 @@ These two queries are semantically identical:
 ```
 
 
-## Field Alias
+## 域别称(Field Alias)
 
 Alias : Name :
 
-By default, the key in the response object will use the field name
-queried. However, you can define a different name by specifying an alias.
+默认情况下，响应得到的对象中的key使用字段名词，但是你可以使用制定别名来定义不同的名称。
 
-In this example, we can fetch two profile pictures of different sizes and ensure
-the resulting object will not have duplicate keys:
+在这个例子中，我们可以使用别称来获得两个不同大小的图片，并确保生成的对象中不会有重复的key。
 
 ```graphql
 {
@@ -336,7 +321,7 @@ the resulting object will not have duplicate keys:
 }
 ```
 
-Which returns the result:
+将会返回以下的结果:
 
 ```js
 {
@@ -349,7 +334,7 @@ Which returns the result:
 }
 ```
 
-Since the top level of a query is a field, it also can be given an alias:
+查询集的顶层域依然是一个字段，所以也可以设置别称
 
 ```graphql
 {
@@ -360,7 +345,7 @@ Since the top level of a query is a field, it also can be given an alias:
 }
 ```
 
-Returns the result:
+将会返回以下的结果:
 
 ```js
 {
@@ -371,27 +356,26 @@ Returns the result:
 }
 ```
 
-A field's response key is its alias if an alias is provided, and it is
-otherwise the field's name.
+如果提供了别称，则字段的响应key是其别称，否则为该字段的名称。
 
 
-## Fragments
+## 片段 ／ Fragments
 
-FragmentSpread : ... FragmentName Directives?
+片段解构／FragmentSpread : ... FragmentName Directives?
 
-FragmentDefinition : fragment FragmentName TypeCondition Directives? SelectionSet
+片段定义／FragmentDefinition : fragment FragmentName TypeCondition Directives? SelectionSet
 
-FragmentName : Name but not `on`
+片段名称／FragmentName : 除了`on`之外的名称
 
-Fragments are the primary unit of composition in GraphQL.
+片段是GraphQL中组成的主要单位。
 
-Fragments allow for the reuse of common repeated selections of fields, reducing
-duplicated text in the document. Inline Fragments can be used directly within a
-selection to condition upon a type condition when querying against an interface
-or union.
+片段允许重用常用的重复选择的字段，减少
+文档中重复的文本。 内联片段可以直接在一个
+在对接口进行查询时根据类型条件进行选择
+或联合。
 
-For example, if we wanted to fetch some common information about mutual friends
-as well as friends of some user:
+例如，如果我们想获取一些关于共同的朋友的常见信息
+还有一些用户的朋友：
 
 ```graphql
 query noFragments {
@@ -410,8 +394,8 @@ query noFragments {
 }
 ```
 
-The repeated fields could be extracted into a fragment and composed by
-a parent fragment or query.
+可以将重复的字段提取成片段并由其组成
+父片段或查询。
 
 ```graphql
 query withFragments {
@@ -432,12 +416,14 @@ fragment friendFields on User {
 }
 ```
 
-Fragments are consumed by using the spread operator (`...`).  All fields selected
+使用解构运算符(`...`)使用片段.  All fields selected
 by the fragment will be added to the query field selection at the same level
 as the fragment invocation. This happens through multiple levels of fragment
 spreads.
 
-For example:
+所有被片段选中的域会作为片段文字添加到同一个层级的查询域选择集合之中。这个事情也会发生在多层的片段解构。
+
+举个例子:
 
 ```graphql
 query withNestedFragments {
@@ -462,26 +448,22 @@ fragment standardProfilePic on User {
 }
 ```
 
-The queries `noFragments`, `withFragments`, and `withNestedFragments` all
-produce the same response object.
+所有无片段的，有片段的，嵌套片段的的查询会产生同样的响应。
 
 
-### Type Conditions
+### 类型条件／Type Conditions
 
 TypeCondition : on NamedType
 
-Fragments must specify the type they apply to. In this example, `friendFields`
-can be used in the context of querying a `User`.
+片段必须指定它们所适用的类型. 这个例子中, `friendFields`可以用在查询`User`的上下文之中.
 
-Fragments cannot be specified on any input value (scalar, enumeration, or input
-object).
+不能在任何输入值（标量，枚举或输入）上指定片段。
 
-Fragments can be specified on object types, interfaces, and unions.
+可以在对象类型，接口和联合体上指定片段。
 
-Selections within fragments only return values when concrete type of the object
-it is operating on matches the type of the fragment.
+片段中的选择只有当具体类型的对象操作符合片段的类型时才返回值。
 
-For example in this query on the Facebook data model:
+例如在Facebook数据模型的这个查询中：
 
 ```graphql
 query FragmentTyping {
@@ -505,10 +487,7 @@ fragment pageFragment on Page {
 }
 ```
 
-The `profiles` root field returns a list where each element could be a `Page` or a
-`User`. When the object in the `profiles` result is a `User`, `friends` will be
-present and `likers` will not. Conversely when the result is a `Page`, `likers`
-will be present and `friends` will not.
+`profiles`根字段返回一个列表，其中每个元素可以是“Page”或“User”。当“profiles”结果中的对象是“User”时，“friends”将会出现，“likers”不会。相反，当结果是一个“页面”，“喜好者”将会出现，“朋友”不会。
 
 ```js
 {
@@ -526,14 +505,11 @@ will be present and `friends` will not.
 ```
 
 
-### Inline Fragments
+### 行内片段／Inline Fragments
 
 InlineFragment : ... TypeCondition? Directives? SelectionSet
 
-Fragments can be defined inline within a selection set. This is done to
-conditionally include fields based on their runtime type. This feature of
-standard fragment inclusion was demonstrated in the `query FragmentTyping`
-example. We could accomplish the same thing using inline fragments.
+片段可以在选择集内部内联定义。这样做有条件地包括基于其运行时类型的字段。在`query FragmentTyping`示例中演示了标准片段包含的特征。我们可以使用内联片段来完成同样的事情。
 
 ```graphql
 query inlineFragmentTyping {
@@ -553,9 +529,7 @@ query inlineFragmentTyping {
 }
 ```
 
-Inline fragments may also be used to apply a directive to a group of fields.
-If the TypeCondition is omitted, an inline fragment is considered to be of the
-same type as the enclosing context.
+也可以使用内联片段将指令应用于一组字段。如果省略了TypeCondition，则内联片段被认为与封闭上下文具有相同的类型。
 
 ```graphql
 query inlineFragmentNoType($expandedInfo: Boolean) {
